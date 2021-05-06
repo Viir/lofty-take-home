@@ -44,3 +44,9 @@ I found documenting the implications costs quite some time. The overall idea of 
 ## Finding a fitting programming language
 
 Elm works for me here because it will be easy to implement the HTTP interface and the visualization based on HTML/SVG. Tools like `elm-test-rs` help to automate testing.
+
+## Automated tests
+
+For some parts on the productive side, automated tests can improve efficiency to find the correct implementation.
+In my experience, coding JSON decoders manually is error-prone. Therefore these a candidates to cover with automated tests from the start.
+In addition, the policy to rank available actions is a candidate for automated testing. We can simulate the server's behavior in the test and assert an upper limit for the number of requests to the server to reach the light switch.
