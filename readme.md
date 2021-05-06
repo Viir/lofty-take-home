@@ -1,3 +1,6 @@
+I considered naming this file 'evolution.md', but I guess that would stop the inline display in the GitHub view of the repository.
+A chronological format seemed more fitting because of the time constraints so that I will simply append new findings instead of integrating them into a more structured document.
+
 Reference is the challenge description from https://gist.github.com/architectcodes/b9d5cc712c2508f64aa7090d692d3a86
 
 ## Clarifying physics
@@ -27,3 +30,14 @@ This one surprised me a bit: We don't know our location initially, and it is exp
 ### Skipping details for now
 
 I found documenting the implications costs quite some time. The overall idea of the challenge was also to demonstrate some coding. Therefore I am skipping some details here and instead start with the implementation.
+
+> Hi Tomek,
+> 
+> Thanks for the heads up.
+> I found that the text in the GitHub gist describes the robot's environment only partially. However, exploring the server's behavior might be sufficient to clarify the remaining open questions.
+> I described the questions currently remaining at https://github.com/Viir/lofty-take-home/commit/3b9fa55f506399eca9858c82f52a60e1ff8ed658
+> 
+> Anyway, there is enough clarity for me to already start with the implementation.
+> 
+> Cheers,Michael
+
