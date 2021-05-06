@@ -1,7 +1,7 @@
 I considered naming this file 'evolution.md', but I guess that would stop the inline display in the GitHub view of the repository.
 A chronological format seemed more fitting because of the time constraints so that I will simply append new findings instead of integrating them into a more structured document.
 
-Reference is the challenge description from https://gist.github.com/architectcodes/b9d5cc712c2508f64aa7090d692d3a86
+Reference is the challenge description from https://gist.github.com/architectcodes/b9d5cc712c2508f64aa7090d692d3a86 (`lofty-take-home-coding-challenge.md`)
 
 ## Clarifying physics
 
