@@ -41,3 +41,6 @@ I found documenting the implications costs quite some time. The overall idea of 
 > 
 > Cheers,Michael
 
+## Finding a fitting programming language
+
+Elm works for me here because it will be easy to implement the HTTP interface and the visualization based on HTML/SVG. Tools like `elm-test-rs` help to automate testing.
