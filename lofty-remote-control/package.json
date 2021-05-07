@@ -1,0 +1,12 @@
+{
+    "private": true,
+    "name": "lofty-remote-control",
+    "scripts": {
+        "postinstall": "elm-tooling install",
+        "build": "elm make src/Main.elm  --output=lofty-remote-control.html",
+        "test": "elm-test-rs"
+    },
+    "devDependencies": {
+        "elm-tooling": "^1.3.0"
+    }
+}
