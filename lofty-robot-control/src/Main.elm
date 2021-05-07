@@ -161,7 +161,22 @@ view state =
                             "black"
 
                         validLocationsSvgs =
-                            []
+                            List.range 1 roomDimensions.width
+                                |> List.concatMap
+                                    (\x ->
+                                        List.range 1 roomDimensions.length
+                                            |> List.map
+                                                (\y ->
+                                                    Svg.circle
+                                                        [ SA.cx (String.fromInt x)
+                                                        , SA.cy (String.fromInt y)
+                                                        , SA.r "0.1"
+                                                        , SA.stroke "none"
+                                                        , SA.fill "DarkBlue"
+                                                        ]
+                                                        []
+                                                )
+                                    )
                     in
                     [ Html.text
                         ("Width: "
