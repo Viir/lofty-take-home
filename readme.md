@@ -2,9 +2,9 @@ TODO: Explain to Jack how to use this repository.
 
 For documentation of the development process, see [process.md](./process.md)
 
-## Using the app `lofty-remote-control`
+## Using the app `lofty-robot-control`
 
-All commands in this section work in the subdirectory [lofty-remote-control](./lofty-remote-control) unless specified otherwise.
+All commands in this section work in the subdirectory [lofty-robot-control](./lofty-robot-control) unless specified otherwise.
 
 ### Setup
 
@@ -12,7 +12,7 @@ Install Node.js from https://nodejs.org/en/download/, then run the command `npm
 
 ### Building the runnable application
 
-Running the command `npm run build` produces an HTML file that you can load in a web browser. The build process saves this file at `lofty-remote-control.html`
+Running the command `npm run build` produces an HTML file that you can load in a web browser. The build process saves this file at `lofty-robot-control.html`
 
 ### Automated testing
 

@@ -1,9 +1,9 @@
 {
     "private": true,
-    "name": "lofty-remote-control",
+    "name": "lofty-robot-control",
     "scripts": {
         "postinstall": "elm-tooling install",
-        "build": "elm make src/Main.elm  --debug  --output=lofty-remote-control.html",
+        "build": "elm make src/Main.elm  --debug  --output=lofty-robot-control.html",
         "test": "elm-test-rs"
     },
     "devDependencies": {
