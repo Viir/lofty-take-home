@@ -1,1 +1,1 @@
-npx  lofty-take-home-server
+npx  lofty-take-home-server@1.0.7
