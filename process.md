@@ -20,11 +20,15 @@ When visualizing a robot flying around, intuition tells the direction it comes f
 
 ### Optimizing checking for reachability
 
-I'd start the project assuming that Bumpy moves in a straight line, just because that seems simplest. That means that if an obstacle prevents us from moving with a single command from 1|1 to 3|1, I assume we cannot move with a single command from 2|1 to 3|1. We would have to try to reach that point from another direction, such as 2|2 to 3|1. This allows us to constrain the action space further, as we don't have to sample all points as origins of a given destination.
+I'd start the project assuming that Bumpy moves in a straight line, just because that seems simplest. That means that if an obstacle prevents Bumpy from moving with a single command from 1|1 to 3|1, I assume it also cannot move with a single command from 2|1 to 3|1. We would have to try to reach that point from another direction, such as 2|2 to 3|1. This allows us to constrain the action space further, as we don't have to sample all points as origins of a given destination.
 
-### Learning our location
+### Learning Bumpys location
 
-This one surprised me a bit: We don't know our location initially, and it is expensive to measure. When we run into an obstacle, we don't know our location anymore. We also don't know if it changed at all since the last move command. Therefore it might be more efficient to move backward as soon as we run into an obstacle, as this is the sure way to learn our new location. But how do we discover our first location? So far, I do not see a better strategy than to use random move commands.
+This one surprised me a bit: We don't know Bumpys location initially, and it could be expensive to maintain knowledge of the location.
+
+The only way to learn Bumpys location is to use a 'Move' command. In case that command succeeds, we know the location. How do we discover the first location? So far, I do not see a better strategy than to use random move commands, until we succeed for the first time.
+
+When we run into an obstacle, we don't know our location anymore. It could be still the same as before, but it could also be somewhere between the previous and target location. Therefore, depending on the prevalence of obstacles, it might be more efficient to move backward as soon as we run into an obstacle, as this is a sure way to learn our new location. 
 
 ### Skipping details for now
 
