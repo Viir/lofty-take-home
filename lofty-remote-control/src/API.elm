@@ -4,6 +4,10 @@ import Dict
 import Json.Decode
 
 
+type alias RoomDimensions =
+    { width : Int, length : Int }
+
+
 type BumpyObstacleSensorStatus
     = IDLE
     | OBSTACLE_DETECTED
@@ -19,6 +23,13 @@ type alias BumpyMoveResponse =
     , lightSensorStatus : BumpyLighSensorStatus
     , message : String
     }
+
+
+jsonDecodeMeasureRoomResponse : Json.Decode.Decoder RoomDimensions
+jsonDecodeMeasureRoomResponse =
+    Json.Decode.map2 RoomDimensions
+        (Json.Decode.field "width" Json.Decode.int)
+        (Json.Decode.field "length" Json.Decode.int)
 
 
 parseBumpyMoveResponse : String -> Result String BumpyMoveResponse
