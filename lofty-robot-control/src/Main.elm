@@ -21,8 +21,12 @@ main =
 
 
 type Event
-    = MeasureRoomResult (Result Http.Error RoomDimensions)
-    | UserInputGoTo ( Int, Int )
+    = UserInputMeasureRoom
+    | MeasureRoomResult (Result Http.Error RoomDimensions)
+
+
+
+--| UserInputGoTo ( Int, Int )
 
 
 type alias AppAction =
@@ -47,34 +51,15 @@ type alias SessionResult =
     Result String String
 
 
-type alias State =
-    List Event
+type State
+    = Initial
+    | RequestingMeasureRoom
+    | MeasureRoomErr Http.Error
+    | MeasureRoomOk MeasureRoomOkState
 
 
-chooseNextRequest : State -> FinishOrContinue SessionResult RequestToServer
-chooseNextRequest state =
-    case measureRoomResultFromState state of
-        Nothing ->
-            ContinueSession MeasureRoom
-
-        Just (Err measureRoomError) ->
-            FinishSession (Err ("Failed to measure room: " ++ describeHttpError measureRoomError))
-
-        Just (Ok roomDimensions) ->
-            FinishSession (Err "Not implemented: Continue after learning room size")
-
-
-chooseNextAction : State -> AppAction
-chooseNextAction state =
-    case chooseNextRequest state of
-        FinishSession finish ->
-            FinishSession finish
-
-        ContinueSession continue ->
-            {-
-               When we introduce events that should not trigger a new request, then we need to branch here and use `WaitForPendingRequest`
-            -}
-            ContinueSession (SendRequest continue)
+type alias MeasureRoomOkState =
+    API.RoomDimensions
 
 
 cmdFromRequestToServer : RequestToServer -> Cmd Event
@@ -90,44 +75,46 @@ cmdFromRequestToServer request =
 
 init : () -> ( State, Cmd Event )
 init _ =
-    let
-        state =
-            []
-
-        maybeCmd =
-            case chooseNextRequest state of
-                FinishSession _ ->
-                    Nothing
-
-                ContinueSession request ->
-                    Just (cmdFromRequestToServer request)
-    in
-    ( state, Maybe.withDefault Cmd.none maybeCmd )
+    ( Initial, Cmd.none )
 
 
 update : Event -> State -> ( State, Cmd Event )
 update event stateBefore =
-    case chooseNextAction stateBefore of
-        FinishSession _ ->
-            ( stateBefore, Cmd.none )
+    case event of
+        UserInputMeasureRoom ->
+            ( RequestingMeasureRoom, cmdFromRequestToServer MeasureRoom )
 
-        _ ->
-            let
-                state =
-                    event :: stateBefore
+        MeasureRoomResult (Err error) ->
+            ( MeasureRoomErr error, Cmd.none )
 
-                maybeCmd =
-                    case chooseNextAction state of
-                        FinishSession _ ->
-                            Nothing
+        MeasureRoomResult (Ok ok) ->
+            ( MeasureRoomOk ok, Cmd.none )
 
-                        ContinueSession (WaitForPendingRequest _) ->
-                            Nothing
 
-                        ContinueSession (SendRequest request) ->
-                            Just (cmdFromRequestToServer request)
-            in
-            ( state, Maybe.withDefault Cmd.none maybeCmd )
+
+{-
+   case chooseNextAction stateBefore of
+       FinishSession _ ->
+           ( stateBefore, Cmd.none )
+
+       _ ->
+           let
+               state =
+                   event :: stateBefore
+
+               maybeCmd =
+                   case chooseNextAction state of
+                       FinishSession _ ->
+                           Nothing
+
+                       ContinueSession (WaitForPendingRequest _) ->
+                           Nothing
+
+                       ContinueSession (SendRequest request) ->
+                           Just (cmdFromRequestToServer request)
+           in
+           ( state, Maybe.withDefault Cmd.none maybeCmd )
+-}
 
 
 subscriptions : State -> Sub Event
@@ -138,89 +125,78 @@ subscriptions _ =
 view : State -> Html.Html Event
 view state =
     let
-        currentRequestText =
-            case chooseNextRequest state of
-                FinishSession (Err sessionError) ->
-                    "Session finished with error: " ++ sessionError
-
-                FinishSession (Ok success) ->
-                    "Session completed: " ++ success
-
-                ContinueSession request ->
-                    "Session continuing: " ++ describeRequest request
-
-        roomElement =
-            case measureRoomResultFromState state of
-                Nothing ->
-                    Html.text "Did not yet measure room dimensions"
-
-                Just (Err error) ->
-                    Html.text ("Failed to measure room dimensions: " ++ describeHttpError error)
-
-                Just (Ok roomDimensions) ->
-                    let
-                        roomBackgroundColor =
-                            "black"
-
-                        validLocationsSvgs =
-                            List.range 1 roomDimensions.width
-                                |> List.concatMap
-                                    (\x ->
-                                        List.range 1 roomDimensions.length
-                                            |> List.map
-                                                (\y ->
-                                                    Svg.circle
-                                                        [ SA.cx (String.fromInt x)
-                                                        , SA.cy (String.fromInt y)
-                                                        , SA.r "0.1"
-                                                        , SA.stroke "none"
-                                                        , SA.fill "DarkBlue"
-                                                        , Html.Events.onClick (UserInputGoTo ( x, y ))
-                                                        ]
-                                                        []
-                                                )
-                                    )
-                    in
-                    [ Html.text
-                        ("Width: "
-                            ++ String.fromInt roomDimensions.width
-                            ++ ", Length: "
-                            ++ String.fromInt roomDimensions.length
-                        )
-                    , Svg.svg
-                        [ SA.width "400px"
-                        , SA.height "400px"
-                        , SA.viewBox
-                            ([ 0, 0, roomDimensions.width + 1, roomDimensions.length + 1 ]
-                                |> List.map String.fromInt
-                                |> String.join " "
-                            )
-                        ]
-                        (Svg.rect
-                            [ SA.fill roomBackgroundColor
-                            , SA.x "-1"
-                            , SA.y "-1"
-                            , SA.width "99"
-                            , SA.height "99"
-                            ]
-                            []
-                            :: validLocationsSvgs
-                        )
-                    ]
-                        |> List.map (List.singleton >> Html.div [])
-                        |> Html.div []
+        greetingScreen showButton =
+            [ Html.text "Greeting text" ]
+                |> Html.div []
     in
-    [ ( "Status", Html.text currentRequestText )
-    , ( "Room", roomElement )
-    ]
-        |> List.map
-            (\( label, htmlElement ) ->
-                [ [ Html.text label ] |> Html.h3 []
-                , [ htmlElement ] |> Html.div [ HA.style "margin-left" "1em" ]
-                ]
-                    |> Html.div []
+    case state of
+        Initial ->
+            greetingScreen True
+
+        RequestingMeasureRoom ->
+            greetingScreen False
+
+        MeasureRoomErr error ->
+            Html.text ("Failed to measure room dimensions: " ++ describeHttpError error)
+
+        MeasureRoomOk ok ->
+            viewMeasureRoomOk ok
+
+
+viewMeasureRoomOk : MeasureRoomOkState -> Html.Html Event
+viewMeasureRoomOk roomDimensions =
+    let
+        roomBackgroundColor =
+            "black"
+
+        validLocationsSvgs =
+            List.range 1 roomDimensions.width
+                |> List.concatMap
+                    (\x ->
+                        List.range 1 roomDimensions.length
+                            |> List.map
+                                (\y ->
+                                    Svg.circle
+                                        [ SA.cx (String.fromInt x)
+                                        , SA.cy (String.fromInt y)
+                                        , SA.r "0.1"
+                                        , SA.stroke "none"
+                                        , SA.fill "DarkBlue"
+
+                                        -- , Html.Events.onClick (UserInputGoTo ( x, y ))
+                                        ]
+                                        []
+                                )
+                    )
+    in
+    [ Html.text
+        ("Width: "
+            ++ String.fromInt roomDimensions.width
+            ++ ", Length: "
+            ++ String.fromInt roomDimensions.length
+        )
+    , Svg.svg
+        [ SA.width "400px"
+        , SA.height "400px"
+        , SA.viewBox
+            ([ 0, 0, roomDimensions.width + 1, roomDimensions.length + 1 ]
+                |> List.map String.fromInt
+                |> String.join " "
             )
-        |> Html.div [ HA.style "margin" "1em" ]
+        ]
+        (Svg.rect
+            [ SA.fill roomBackgroundColor
+            , SA.x "-1"
+            , SA.y "-1"
+            , SA.width "99"
+            , SA.height "99"
+            ]
+            []
+            :: validLocationsSvgs
+        )
+    ]
+        |> List.map (List.singleton >> Html.div [])
+        |> Html.div []
 
 
 describeRequest : RequestToServer -> String
@@ -235,18 +211,21 @@ serverAddress =
     "http://localhost:3000"
 
 
-measureRoomResultFromState : State -> Maybe (Result Http.Error RoomDimensions)
-measureRoomResultFromState =
-    List.filterMap
-        (\event ->
-            case event of
-                MeasureRoomResult measureRoomResult ->
-                    Just measureRoomResult
 
-                _ ->
-                    Nothing
-        )
-        >> List.head
+{-
+   measureRoomResultFromState : State -> Maybe (Result Http.Error RoomDimensions)
+   measureRoomResultFromState =
+       List.filterMap
+           (\event ->
+               case event of
+                   MeasureRoomResult measureRoomResult ->
+                       Just measureRoomResult
+
+                   _ ->
+                       Nothing
+           )
+           >> List.head
+-}
 
 
 describeHttpError : Http.Error -> String
