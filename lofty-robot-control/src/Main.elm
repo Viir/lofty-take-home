@@ -4,6 +4,7 @@ import API exposing (RoomDimensions)
 import Browser
 import Html
 import Html.Attributes as HA
+import Html.Events
 import Http
 import Svg
 import Svg.Attributes as SA
@@ -174,6 +175,7 @@ view state =
                                                         , SA.r "0.1"
                                                         , SA.stroke "none"
                                                         , SA.fill "DarkBlue"
+                                                        , Html.Events.onClick (UserInputGoTo ( x, y ))
                                                         ]
                                                         []
                                                 )
