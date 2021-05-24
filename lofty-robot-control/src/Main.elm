@@ -21,6 +21,7 @@ main =
 
 type Event
     = MeasureRoomResult (Result Http.Error RoomDimensions)
+    | UserInputGoTo ( Int, Int )
 
 
 type alias AppAction =
@@ -239,6 +240,9 @@ measureRoomResultFromState =
             case event of
                 MeasureRoomResult measureRoomResult ->
                     Just measureRoomResult
+
+                _ ->
+                    Nothing
         )
         >> List.head
 
